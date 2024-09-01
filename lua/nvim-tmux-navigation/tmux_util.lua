@@ -3,16 +3,28 @@ local util = {}
 local tmux_directions = { ['p'] = 'l', ['h'] = 'L', ['j'] = 'D', ['k'] = 'U', ['l'] = 'R', ['n'] = 't:.+' }
 
 -- send the tmux command to the server running on the socket
--- given by the environment variable $TMUX
+-- given by the environment variable $TMUX.
+-- `command` must be a list of string arguments, since it is not
+-- interpreted by a shell.
 --
 -- the check if tmux is actually running (so the variable $TMUX is
 -- not nil) is made before actually calling this function
 local function tmux_command(args)
     local tmux_socket = vim.fn.split(vim.env.TMUX, ',')[1]
+    -- `system` does not go through the shell if it is given a
+    -- list rather than a single string; this is critical because
+    -- shells like Fish are very slow, and we don't want to add
+    -- its startup latency to every single pane switch
+    --
+    -- `unpack` was deprecated in Lua 5.1 in favor of
+    -- `table.unpack`; to be safe we use whichever one exists in
+    -- the user's environment.
+    -- source: https://github.com/hrsh7th/nvim-cmp/issues/1017
     local command = {
-      "tmux",
-      "-S",
-      tmux_socket,
+        "tmux",
+        "-S",
+        tmux_socket,
+        (unpack or table.unpack)(args)
     };
 
     -- Concat args into command
@@ -32,7 +44,7 @@ local function is_tmux_pane_zoomed()
     }):gsub("%s+", "") -- the output of the tmux command is "1\n", so we strip that away
 
     if zoomed_value == "1" then
-      return true
+        return true
     end
 
     return false
