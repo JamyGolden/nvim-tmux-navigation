@@ -52,7 +52,7 @@ end
 
 -- whether tmux should take control over the navigation
 function util.should_tmux_control(is_same_winnr, disable_nav_when_zoomed)
-    if is_tmux_pane_zoomed() and disable_nav_when_zoomed then
+    if disable_nav_when_zoomed and is_tmux_pane_zoomed() then
         return false
     end
     return is_same_winnr

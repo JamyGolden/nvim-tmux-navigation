@@ -232,6 +232,13 @@ more:
    possible workaround using `pgrep` (this might fail to work in some cases
    though; if you do find such a case please open an issue).
 
+   If you are still having performance problems when switching panes inside of
+   Neovim, consider setting `disable_when_zoomed = false` in the configuration
+   for this plugin. When enabled, this config option causes
+   `nvim-tmux-navigation` to invoke the `tmux` CLI every time you switch panes;
+   disabling this switch circumvents this system call and makes switching panes
+   much faster!
+
 3. Q: The plugin doesn't work when interacting with
    [Poetry](https://python-poetry.org/) shells.
    A: This happens because Poetry spawns sub-tty's, therefore messing with
